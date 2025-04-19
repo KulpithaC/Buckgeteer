@@ -1,0 +1,26 @@
+# Frontend (React + Vite)
+node_modules/
+dist/
+public/
+.vite/
+
+# Backend (Node.js + Express)
+node_modules/
+.env
+db/
+views/
+config/
+
+# General
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+*.tmp
+*.log
+*.cache
+
+# Comment: Ignore version-specific files in package.json
+package-lock.json
+yarn.lock
+npm-debug.log
