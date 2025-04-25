@@ -5,8 +5,12 @@ const {
   updateTransaction,
   deleteTransaction,
 } = require("../controllers/transactionController");
+const { authMiddleware } = require("../middlewares/authMiddleware");
 
 const router = express.Router();
+
+// Protect all routes after this middleware
+router.use(authMiddleware);
 
 // Get all transactions
 router.get("/", getTransactions);

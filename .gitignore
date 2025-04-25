@@ -9,7 +9,6 @@ node_modules/
 .env
 db/
 views/
-config/
 
 # General
 .DS_Store
