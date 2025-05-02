@@ -1,17 +1,76 @@
 import { React, useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
 
 const Register = () => {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.id]: e.target.value,
+    });
+  };
+
+  const validateForm = () => {
+    if (
+      !formData.name ||
+      !formData.email ||
+      !formData.password ||
+      !formData.confirmPassword
+    ) {
+      setError("All fields are required");
+      return false;
+    }
+    if (formData.password.length < 6) {
+      setError("Password must be at least 6 characters long");
+      return false;
+    }
+    if (formData.password !== formData.confirmPassword) {
+      setError("Passwords do not match");
+      return false;
+    }
+    return true;
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
 
-    if (password !== confirmPassword) {
-      alert("Passwords do not match!");
-      return;
+    if (!validateForm()) return;
+
+    setLoading(true);
+    try {
+      const response = await fetch("http://localhost:5000/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Registration failed");
+      }
+
+      navigate("/login");
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -21,7 +80,12 @@ const Register = () => {
         <h2 className="text-3xl text-center text-green-700 font-bold mb-6">
           Register
         </h2>
-        <form className="space-y-4">
+        {error && (
+          <div className="bg-red-50 text-red-500 p-3 rounded-md mb-4">
+            {error}
+          </div>
+        )}
+        <form className="space-y-4" onSubmit={handleSubmit}>
           <div>
             <label
               className="block text-sm font-medium text-gray-700 mb-1"
@@ -30,12 +94,12 @@ const Register = () => {
               Name
             </label>
             <input
-              type="name"
+              type="text"
               id="name"
               className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-green-500"
               required
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              value={formData.name}
+              onChange={handleChange}
             />
           </div>
           <div>
@@ -50,8 +114,8 @@ const Register = () => {
               id="email"
               className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-green-500"
               required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={formData.email}
+              onChange={handleChange}
             />
           </div>
           <div>
@@ -66,9 +130,13 @@ const Register = () => {
               id="password"
               className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-green-500"
               required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              minLength={6}
+              value={formData.password}
+              onChange={handleChange}
             />
+            <p className="text-xs text-gray-500 mt-1">
+              Password must be at least 6 characters long
+            </p>
           </div>
           <div>
             <label
@@ -82,19 +150,22 @@ const Register = () => {
               id="confirmPassword"
               className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-green-500"
               required
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
+              value={formData.confirmPassword}
+              onChange={handleChange}
             />
           </div>
-          <button className="w-full bg-green-700 text-white font-semibold py-2 rounded-md hover:bg-green-600 transition">
-            Register
+          <button
+            className="w-full bg-green-700 text-white font-semibold py-2 rounded-md hover:bg-green-600 transition disabled:bg-green-300"
+            disabled={loading}
+          >
+            {loading ? "Registering..." : "Register"}
           </button>
         </form>
         <p className="text-center text-sm text-gray-600 mt-4">
           Already have an account?{" "}
-          <a href="/login" className="text-green-700 font-semibold">
+          <Link to="/login" className="text-green-700 font-semibold">
             Login
-          </a>
+          </Link>
         </p>
       </div>
     </section>

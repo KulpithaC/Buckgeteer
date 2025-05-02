@@ -1,14 +1,38 @@
 import { React, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     // Handle login logic here
-    console.log("Email:", email);
-    console.log("Password:", password);
+    try {
+      const response = await fetch("http://localhost:5000/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      const data = await response.json();
+      const { token } = data;
+      if (token) {
+        localStorage.setItem("token", token);
+        alert("Login successful!");
+        navigate("/dashboard"); // Redirect to dashboard or home page
+      }
+    } catch (error) {
+      console.error("Login failed:", error);
+      alert("Login failed. Please try again.");
+    }
   };
 
   return (
@@ -17,7 +41,7 @@ const Login = () => {
         <h2 className="text-3xl text-center text-green-700 font-bold mb-6">
           Login
         </h2>
-        <form className="space-y-4">
+        <form className="space-y-4" onSubmit={handleSubmit}>
           <div>
             <label
               className="block text-sm font-medium text-gray-700 mb-1"
