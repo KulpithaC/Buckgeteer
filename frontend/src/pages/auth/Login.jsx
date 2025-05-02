@@ -1,37 +1,63 @@
+import axios from "axios";
 import { React, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
+import useAuth from "../../hooks/useAuth";
 
 const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const navigate = useNavigate();
+  const { login } = useAuth(); // เพิ่ม useAuth hook
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.id]: e.target.value,
+    });
+  };
+
+  const validateForm = () => {
+    if (!formData.email || !formData.password) {
+      setError("All fields are required");
+      return false;
+    }
+    if (formData.password.length < 6) {
+      setError("Password must be at least 6 characters long");
+      return false;
+    }
+    return true;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle login logic here
+    setError("");
+
+    if (!validateForm()) return;
+
+    setLoading(true);
     try {
-      const response = await fetch("http://localhost:5000/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
+      const { data } = await axios.post(
+        "http://localhost:5000/api/auth/login",
+        {
+          email: formData.email,
+          password: formData.password,
+        }
+      );
 
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-
-      const data = await response.json();
-      const { token } = data;
-      if (token) {
-        localStorage.setItem("token", token);
-        alert("Login successful!");
-        navigate("/dashboard"); // Redirect to dashboard or home page
+      if (data.token && data.user) {
+        login(data.user, data.token); // ใช้ login function จาก context
+        navigate("/dashboard");
       }
     } catch (error) {
-      console.error("Login failed:", error);
-      alert("Login failed. Please try again.");
+      setError(
+        error.response?.data?.message || error.message || "Login failed"
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -49,13 +75,18 @@ const Login = () => {
             >
               Email
             </label>
+            {error && (
+              <div className="bg-red-50 text-red-500 p-3 rounded-md mb-4">
+                {error}
+              </div>
+            )}
             <input
               type="email"
               id="email"
               className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-green-500"
               required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={formData.email}
+              onChange={handleChange}
             />
           </div>
           <div>
@@ -70,19 +101,22 @@ const Login = () => {
               id="password"
               className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-green-500"
               required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              value={formData.password}
+              onChange={handleChange}
             />
           </div>
-          <button className="w-full bg-green-700 text-white font-semibold py-2 rounded-md hover:bg-green-600 transition">
-            Login
+          <button
+            className="w-full bg-green-700 text-white font-semibold py-2 rounded-md hover:bg-green-600 transition"
+            disabled={loading}
+          >
+            {loading ? "Logining..." : "Login"}
           </button>
         </form>
         <p className="text-center text-sm text-gray-600 mt-4">
           Don't have an account?{" "}
-          <a href="/register" className="text-green-700 font-semibold">
+          <Link to="/register" className="text-green-700 font-semibold">
             Register
-          </a>
+          </Link>
         </p>
       </div>
     </section>
