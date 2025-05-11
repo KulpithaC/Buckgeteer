@@ -69,17 +69,17 @@ const Login = () => {
         </h2>
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div>
+            {error && (
+              <div className="bg-red-50 text-red-500 p-3 rounded-md mb-4">
+                {error}
+              </div>
+            )}
             <label
               className="block text-sm font-medium text-gray-700 mb-1"
               htmlFor="email"
             >
               Email
             </label>
-            {error && (
-              <div className="bg-red-50 text-red-500 p-3 rounded-md mb-4">
-                {error}
-              </div>
-            )}
             <input
               type="email"
               id="email"

@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 export default function HeroSection() {
   return (
     <section className="bg-green-50 min-h-screen flex flex-col items-center justify-center text-center px-6 md:px-12">
-      <h1 className="text-4xl md:text-6xl font-bold text-green-600 leading-tight mb-6">
+      <h1 className="text-4xl md:text-6xl font-bold text-green-800 leading-tight mb-6">
         บริหารเงินอย่างชาญฉลาด
         <br />
         กับ Buckgeteer
