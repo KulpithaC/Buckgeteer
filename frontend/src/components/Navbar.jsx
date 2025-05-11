@@ -19,19 +19,24 @@ export default function Navbar() {
 
   return (
     <nav className="bg-green-700 p-4 flex items-center justify-between shadow-md relative">
-      <Link to="/" className="text-2xl font-bold text-white">
-        Buckgeteer
-      </Link>
+      {isLoggedIn ? (
+        <>
+          <Link to="/dashboard" className="text-2xl font-bold text-white">
+            Buckgeteer
+          </Link>
+        </>
+      ) : (
+        <>
+          <Link to="/" className="text-2xl font-bold text-white">
+            Buckgeteer
+          </Link>{" "}
+        </>
+      )}
 
       {/* Desktop Navigation */}
       <ul className="hidden md:flex items-center space-x-6">
         {isLoggedIn ? (
           <>
-            <li>
-              <Link to="/dashboard" className="text-white font-semibold">
-                Dashboard
-              </Link>
-            </li>
             <li>
               <button
                 onClick={handleLogout}
