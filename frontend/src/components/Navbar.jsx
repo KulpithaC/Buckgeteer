@@ -22,13 +22,13 @@ export default function Navbar() {
       {isLoggedIn ? (
         <>
           <Link to="/dashboard" className="text-2xl font-bold text-white">
-            Buckgeteer
+            BUCKGETEER
           </Link>
         </>
       ) : (
         <>
           <Link to="/" className="text-2xl font-bold text-white">
-            Buckgeteer
+            BUCKGETEER
           </Link>{" "}
         </>
       )}
